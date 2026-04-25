@@ -4762,7 +4762,6 @@ function SearchMode() {
   const q = query.trim().toLowerCase();
   const results = q.length < 1 ? [] : CARDS.filter(c =>
     c.jp.toLowerCase().includes(q) ||
-    (c.furi || "").toLowerCase().includes(q) ||
     c.romaji.toLowerCase().includes(q) ||
     c.id_text.toLowerCase().includes(q) ||
     c.desc.toLowerCase().includes(q)
@@ -5371,7 +5370,7 @@ function SumberMode() {
           /* ── CARD VIEW (flashcard) ── */
           <>
             {/* progress bar */}
-            <div style={{ height: 5, background: "rgba(255,255,255,0.07)", borderRadius: 99, marginBottom: 14, overflow: "hidden" }}>
+            <div style={{ height: 4, background: "rgba(255,255,255,0.07)", borderRadius: 99, marginBottom: 14, overflow: "hidden" }}>
               <div style={{ height: "100%", width: `${((srcIdx + 1) / srcCards.length) * 100}%`, background: `linear-gradient(90deg,${accent}88,${accent})`, borderRadius: 99, transition: "width 0.3s ease" }} />
             </div>
             <div style={{ fontSize: 11, color: "#64748b", textAlign: "center", marginBottom: 8 }}>Kartu {srcIdx + 1} / {srcCards.length}</div>
@@ -5393,7 +5392,7 @@ function SumberMode() {
                   <div style={{ textAlign: "center", width: "100%" }}>
                     <JpFront text={card.jp} />
                     <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 10 }}>{card.romaji}</div>
-                    <div style={{ fontSize: 9, color: "#475569", marginTop: 10, opacity: 0.6 }}>tap · swipe</div>
+                    <div style={{ fontSize: 9, color: "#475569", marginTop: 10, opacity: 0.6 }}>ketuk = balik · geser = next</div>
                   </div>
                 ) : (
                   <div style={{ textAlign: "center", width: "100%" }}>
@@ -5930,7 +5929,7 @@ function DescBlock({ text }) {
   const blockStyle = { fontSize:12, lineHeight:1.7, textAlign:"left" };
 
   if (hasCircled) {
-    const tokens = text.split(/(①|②|③|④|⑤|⑥|⑦|⑧|⑨|⑩)/);
+    const tokens = text.split(/(①|②|③|④|⑤|⑥|⑦|⑧|⑨|⑩|⑪|⑫|⑬|⑭|⑮)/);
     const items = []; let intro = ""; let cur = null;
     for (const t of tokens) {
       if (t.length === 1 && CIRCLED.includes(t)) {
@@ -6506,3 +6505,4 @@ export default function FlashcardApp() {
 // v72 — 1345 kartu — 2026-04-25 — EXHAUSTIVE EDGE CASE FIXES: (1) JACMode options: idPart extraction fixed → LAST non-Japanese paren content (not first) — future-proofs when data adds furigana; extractReadings() applied — returns null for current ASCII-paren JAC data but ready; furigana row shown when showHiragana||selected (respects toggle); alignItems flex-start fix; (2) SimulasiMode options: same fix — idPart LAST non-JP paren, extractReadings() applied, furigana+ID rows after answering only (exam mode); (3) DangerMode question card: REMOVED 🇮🇩 {item.correct} — user confirmed unnecessary since options ARE the Indonesian meanings; only furigana shown; outer condition simplified to item.furi check; (4) WaygroundQuizMode: showJPHint now uses showHint (💡) not showFuri (あ) — JP hints are hints, not readings; showOptID now requires optIsJP(opt) — ID options skip redundant opts_id display; NOTE: JAC options have NO furigana in data (all ASCII parens, 0 full-width) — this is a DATA limitation requiring hygiene pass, not a code bug
 // v72 — 1345 kartu — 2026-04-25 — HYGIENE: Wayground hint content overhaul (129 replacements across wg6-wg9): All answer-revealing hints replaced with kanji breakdowns (X=meaning, Y=meaning) or context clues. Patterns fixed: (1) 'JP term?' → kanji structure breakdown; (2) 'ID meaning?' → kanji breakdown instead of direct answer; (3) 'JP1 or JP2?' → concept description that disambiguates without revealing which is correct; (4) 'EN equivalent?' → kanji reading or usage context. Remaining OK hints: wg9 fill-in-blank contextual hints (Q81-100) were already non-spoiler. JAC_OFFICIAL options furigana remains a pending data hygiene task (requires adding 漢字（ふりがな） inline to all option text).
 // v73 — 1345 kartu — 2026-04-26 — DEEP HYGIENE PASS: (1) JAC_OFFICIAL furigana: added 漢字（ふりがな） readings to 260 option strings across all 95 questions — extractReadings() regex expanded to handle mixed-script (hiragana+katakana+numbers) readings; (2) Removed 224 answer-revealing ✓ markers from Wayground opts_id strings; (3) Fixed FlashcardMode search: c.furi (non-existent) → c.romaji; (4) Fixed 12 orphan cards with category 'alat' → 'alat_umum' (were invisible in filters/glossary); (5) Extended DescBlock circled numbers ①-⑩ → ①-⑮; (6) Fixed duplicate ⭐ emoji in bintang category label; (7) Improved flashcard interaction hint text ('tap · swipe' → 'ketuk = balik · geser = next'); (8) Standardized progress bar heights to 4px; (9) Typography: extractReadings() now supports full-width paren readings with katakana/numbers for JAC display
+// v74 — 1345 kartu — 2026-04-25 — AUDIT PATCH: (1) SearchMode cleanup: removed stale `c.furi` filter reference (field does not exist); (2) DescBlock circled-number tokenizer now correctly splits ①–⑮ (was ①–⑩ only); (3) Flashcard hint text aligned with v73 claim: `ketuk = balik · geser = next`; (4) SumberMode card progress bar height 5→4 for visual consistency
