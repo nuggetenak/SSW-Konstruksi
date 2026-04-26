@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="theme-color" content="#0f0c29" />
+  <title>インフラ・設備 フラッシュカード — Nugget Nihongo SSW</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;background:#0f0c29}
+    #root{min-height:100vh}
+    #splash{
+      position:fixed;inset:0;background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      gap:16px;z-index:9999;transition:opacity 0.4s;
+    }
+    #splash.hide{opacity:0;pointer-events:none}
+    #splash-title{
+      font-family:'Segoe UI',sans-serif;font-size:18px;font-weight:700;
+      background:linear-gradient(90deg,#f6d365,#fda085);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    }
+    #splash-sub{font-family:'Segoe UI',sans-serif;font-size:12px;color:#475569}
+    .spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,0.1);
+      border-top-color:#f6d365;border-radius:50%;animation:spin 0.8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+  <div id="splash">
+    <div class="spinner"></div>
+    <div id="splash-title">インフラ・設備 フラッシュカード</div>
+    <div id="splash-sub">Nugget Nihongo SSW Konstruksi · Memuat…</div>
+  </div>
+  <div id="root"></div>
+
+  <!-- window.storage polyfill using localStorage -->
+  <script>
+  (function(){
+    var PRE = 'ssw_';
+    window.storage = {
+      get: function(key){
+        return Promise.resolve().then(function(){
+          var v = localStorage.getItem(PRE+key);
+          return v !== null ? {key:key,value:v,shared:false} : null;
+        });
+      },
+      set: function(key,value){
+        return Promise.resolve().then(function(){
+          try{ localStorage.setItem(PRE+key,value); return {key:key,value:value,shared:false}; }
+          catch(e){ return null; }
+        });
+      },
+      delete: function(key){
+        return Promise.resolve().then(function(){
+          localStorage.removeItem(PRE+key);
+          return {key:key,deleted:true,shared:false};
+        });
+      },
+      list: function(prefix){
+        prefix = prefix||'';
+        return Promise.resolve().then(function(){
+          var keys = Object.keys(localStorage)
+            .filter(function(k){ return k.startsWith(PRE+prefix); })
+            .map(function(k){ return k.slice(PRE.length); });
+          return {keys:keys,prefix:prefix,shared:false};
+        });
+      }
+    };
+  })();
+  </script>
+
+  <!-- Google Fonts preload -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&family=Zen+Kaku+Gothic+New:wght@700&display=swap" rel="stylesheet">
+
+  <!-- React 18 -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+  <!-- App (pre-transpiled) -->
+  <script src="app.js"></script>
+
+  <!-- Hide splash once app mounts -->
+  <script>
+    (function(){
+      var splash = document.getElementById('splash');
+      var t = setInterval(function(){
+        if(document.querySelector('#root > div')){
+          clearInterval(t);
+          splash.classList.add('hide');
+          setTimeout(function(){ splash.remove(); }, 500);
+        }
+      }, 100);
+      // Fallback: hide after 8s anyway
+      setTimeout(function(){ if(splash) splash.classList.add('hide'); }, 8000);
+    })();
+  </script>
+</body>
+</html>
