@@ -86,15 +86,28 @@
   <script>
     (function(){
       var splash = document.getElementById('splash');
+      if(!splash) return;
+
+      var removed = false;
+      function dismissSplash(){
+        if(removed || !splash) return;
+        removed = true;
+        splash.classList.add('hide');
+        setTimeout(function(){ if(splash && splash.parentNode) splash.parentNode.removeChild(splash); }, 500);
+      }
+
       var t = setInterval(function(){
         if(document.querySelector('#root > div')){
           clearInterval(t);
-          splash.classList.add('hide');
-          setTimeout(function(){ splash.remove(); }, 500);
+          dismissSplash();
         }
       }, 100);
-      // Fallback: hide after 8s anyway
-      setTimeout(function(){ if(splash) splash.classList.add('hide'); }, 8000);
+
+      // Fallback: dismiss after 8s and clear polling to avoid leaks.
+      setTimeout(function(){
+        clearInterval(t);
+        dismissSplash();
+      }, 8000);
     })();
   </script>
 </body>
