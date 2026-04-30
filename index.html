@@ -94,7 +94,12 @@
         }
       }, 100);
       // Fallback: hide after 8s anyway
-      setTimeout(function(){ if(splash) splash.classList.add('hide'); }, 8000);
+      setTimeout(function(){
+        if(!splash) return;
+        splash.classList.add('hide');
+        clearInterval(t);
+        setTimeout(function(){ if(splash && splash.parentNode) splash.remove(); }, 500);
+      }, 8000);
     })();
   </script>
 </body>
