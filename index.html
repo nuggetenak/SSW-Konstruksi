@@ -41,8 +41,12 @@
     window.storage = {
       get: function(key){
         return Promise.resolve().then(function(){
-          var v = localStorage.getItem(PRE+key);
-          return v !== null ? {key:key,value:v,shared:false} : null;
+          try {
+            var v = localStorage.getItem(PRE+key);
+            return v !== null ? {key:key,value:v,shared:false} : null;
+          } catch (e) {
+            return null;
+          }
         });
       },
       set: function(key,value){
@@ -60,10 +64,14 @@
       list: function(prefix){
         prefix = prefix||'';
         return Promise.resolve().then(function(){
-          var keys = Object.keys(localStorage)
-            .filter(function(k){ return k.startsWith(PRE+prefix); })
-            .map(function(k){ return k.slice(PRE.length); });
-          return {keys:keys,prefix:prefix,shared:false};
+          try {
+            var keys = Object.keys(localStorage)
+              .filter(function(k){ return k.startsWith(PRE+prefix); })
+              .map(function(k){ return k.slice(PRE.length); });
+            return {keys:keys,prefix:prefix,shared:false};
+          } catch (e) {
+            return {keys:[],prefix:prefix,shared:false};
+          }
         });
       }
     };
@@ -86,15 +94,24 @@
   <script>
     (function(){
       var splash = document.getElementById('splash');
+      function hideSplash(removeAfter){
+        if(!splash) return;
+        splash.classList.add('hide');
+        if(removeAfter){
+          setTimeout(function(){ if(splash && splash.parentNode) splash.remove(); }, 500);
+        }
+      }
       var t = setInterval(function(){
         if(document.querySelector('#root > div')){
           clearInterval(t);
-          splash.classList.add('hide');
-          setTimeout(function(){ splash.remove(); }, 500);
+          hideSplash(true);
         }
       }, 100);
-      // Fallback: hide after 8s anyway
-      setTimeout(function(){ if(splash) splash.classList.add('hide'); }, 8000);
+      // Fallback: hide + stop polling after 8s anyway
+      setTimeout(function(){
+        clearInterval(t);
+        hideSplash(false);
+      }, 8000);
     })();
   </script>
 </body>
